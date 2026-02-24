@@ -2,9 +2,9 @@
 
 SQL project focused on relational database design using the **Olist Brazilian E-Commerce dataset** (Kaggle): https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
-** Main Goal**: Shift from writing isolated queries to designing databases
+**Main Goal**: Shift from writing isolated queries to designing databases
 - import raw CSVs
-- normalise data into relational schema in MySQL
+- normalise data into a relational schema in MySQL
 - generate ER diagram
 - write business queries based on the ERD relationships.
 
