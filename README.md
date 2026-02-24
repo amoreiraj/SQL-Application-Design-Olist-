@@ -25,3 +25,9 @@ The Olist dataset has ~9 main CSV files that naturally become tables. Key ones:
 - olist_sellers_dataset.csv : sellers (seller_id, zip_code_prefix, city, state)
 
  ---- 
+## Coverage
+Temporal Coverage Start Date: 01/01/2017
+
+Temporal Coverage End Date: 06/01/2018
+
+--- 
