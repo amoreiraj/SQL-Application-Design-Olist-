@@ -54,6 +54,10 @@ The files were then imported into MySQL to create the initial tables. At this st
 
 3. **Data Understanding / Exploration (EDA)**
 
+tIME to understand the data. This phase focused on understanding how customers are represented in the data and validating whether customer counts are accurate.
+
+<img width="999" height="692" alt="image" src="https://github.com/user-attachments/assets/cd34dd30-5baf-452e-a990-3b540db02846" />
+
 This query overcounts real customers because the same person can have multiple customer_id values (one per order).
 
 ```sql
@@ -76,6 +80,8 @@ HAVING COUNT(DISTINCT customer_id) > 1;
 ```
 Output (data sample): 
 <img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
+
+** The results confirm that some customers have multiple customer_id values, meaning they placed more than one order. This validates that customer_unique_id must be used for accurate customer-level analysis, while customer_id should only be used to join orders.**
 
 4. **Data Cleaning / Preparation**
 5. **Data Modeling / Analysis**
