@@ -18,26 +18,6 @@ SQL project focused on relational database design using the **Olist Brazilian E-
 
 Portfolio showcase for **SQL**, **database design**, and **data analysis** skills.
 
-----
-
-# The Olist dataset:
-
-The Olist dataset has 9 main CSV files that naturally become tables. Key ones:
-
-
-| File                                      | Table Name                     | Key Columns / Purpose                                                                 | Approx. Rows |
-|-------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------|--------------|
-| olist_customers_dataset.csv               | customers                      | customer_id, customer_unique_id, zip_code_prefix, city, state                         | ~99k         |
-| olist_geolocation_dataset.csv             | geolocation                    | zip_code_prefix, lat, lng, city, state (lookup table – multiple rows per prefix)      | ~1M          |
-| olist_orders_dataset.csv                  | orders                         | order_id, customer_id, order_status, purchase/approved/delivered timestamps           | ~99k         |
-| olist_order_items_dataset.csv             | order_items                    | order_id, order_item_id, product_id, seller_id, price, freight_value, shipping_limit  | ~113k        |
-| olist_order_payments_dataset.csv          | order_payments                 | order_id, payment_sequential, payment_type, installments, payment_value               | ~104k        |
-| olist_order_reviews_dataset.csv           | order_reviews                  | review_id, order_id, review_score (1–5), comment_title/message, creation/answer dates | ~99k         |
-| olist_products_dataset.csv                | products                       | product_id, category_name, dimensions, weight, photos_qty, description_length         | ~33k         |
-| product_category_name_translation.csv     | product_category_translation   | product_category_name (PT), product_category_name_english (EN)                        | 71           |
-| olist_sellers_dataset.csv                 | sellers                        | seller_id, zip_code_prefix, city, state                                               | ~3k          |
-
-
  ---- 
 ## Temporal Coverage
 - **Start Date**: 01/01/2017
@@ -67,11 +47,28 @@ HAVING COUNT(DISTINCT customer_id) > 1;
 Output (data sample): 
 <img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
 
+2. **Data Gathering / Collection** For this project, the data was downloaded from the public **Olist Brazilian E-Commerce dataset** on Kaggle. The dataset has 9 CSV files containing information about: customers, orders, products, payments, reviews, sellers, and locations.
+The files were then imported into MySQL to create the initial tables. At this stage, the goal was simply to load the data exactly as provided, without making changes.
+
+- The Olist dataset has 9 main CSV files that naturally become tables. Key ones:
 
 
-3. **Data Gathering / Collection** 
-4. **Data Understanding / Exploration (EDA)**
-5. **Data Cleaning / Preparation**
-6. **Data Modeling / Analysis**
-7. **Evaluation / Interpretation**
-8. **Reporting / Visualization / Communication**
+| File                                      | Table Name                     | Key Columns / Purpose                                                                 | Approx. Rows |
+|-------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------|--------------|
+| olist_customers_dataset.csv               | customers                      | customer_id, customer_unique_id, zip_code_prefix, city, state                         | ~99k         |
+| olist_geolocation_dataset.csv             | geolocation                    | zip_code_prefix, lat, lng, city, state (lookup table – multiple rows per prefix)      | ~1M          |
+| olist_orders_dataset.csv                  | orders                         | order_id, customer_id, order_status, purchase/approved/delivered timestamps           | ~99k         |
+| olist_order_items_dataset.csv             | order_items                    | order_id, order_item_id, product_id, seller_id, price, freight_value, shipping_limit  | ~113k        |
+| olist_order_payments_dataset.csv          | order_payments                 | order_id, payment_sequential, payment_type, installments, payment_value               | ~104k        |
+| olist_order_reviews_dataset.csv           | order_reviews                  | review_id, order_id, review_score (1–5), comment_title/message, creation/answer dates | ~99k         |
+| olist_products_dataset.csv                | products                       | product_id, category_name, dimensions, weight, photos_qty, description_length         | ~33k         |
+| product_category_name_translation.csv     | product_category_translation   | product_category_name (PT), product_category_name_english (EN)                        | 71           |
+| olist_sellers_dataset.csv                 | sellers                        | seller_id, zip_code_prefix, city, state                                               | ~3k          |
+
+3. **Data Understanding / Exploration (EDA)**
+
+
+4. **Data Cleaning / Preparation**
+5. **Data Modeling / Analysis**
+6. **Evaluation / Interpretation**
+7. **Reporting / Visualization / Communication**
