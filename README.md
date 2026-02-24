@@ -64,6 +64,10 @@ GROUP BY customer_unique_id
 HAVING COUNT(DISTINCT customer_id) > 1;
 
 ```
+Output (data sample): 
+<img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
+
+
 
 3. **Data Gathering / Collection** 
 4. **Data Understanding / Exploration (EDA)**
