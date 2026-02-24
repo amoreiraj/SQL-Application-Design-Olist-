@@ -50,10 +50,24 @@ The Olist dataset has 9 main CSV files that naturally become tables. Key ones:
 
 This project follows a structured data analysis workflow:
 
-1. **Define the Problem / Business Understanding**
-2. **Data Gathering / Collection**
-3. **Data Understanding / Exploration (EDA)**
-4. **Data Cleaning / Preparation**
-5. **Data Modeling / Analysis**
-6. **Evaluation / Interpretation**
-7. **Reporting / Visualization / Communication**
+1. **Define the Problem / Business Understanding** The system was designed so that each order is assigned a unique customer_id. As a result, the same person receives a different ID every time they place a new order. This makes each purchase appear to come from a different customer.
+The dataset includes a customer_unique_id specifically to identify the real customer across multiple purchases. Without using this field, the business would overcount customers and struggle to measure repeat purchases.
+Because the system creates a new customer ID for every order, the business cannot easily track repeat customers or accurately analyse true customer behaviour.
+
+The query below is used to identify customer_unique_id and the number of orders ordered as qtd_ids
+```sql
+SELECT
+    customer_unique_id,
+    COUNT(DISTINCT customer_id) AS qtd_ids
+FROM customers
+GROUP BY customer_unique_id
+HAVING COUNT(DISTINCT customer_id) > 1;
+
+```
+
+3. **Data Gathering / Collection** 
+4. **Data Understanding / Exploration (EDA)**
+5. **Data Cleaning / Preparation**
+6. **Data Modeling / Analysis**
+7. **Evaluation / Interpretation**
+8. **Reporting / Visualization / Communication**
