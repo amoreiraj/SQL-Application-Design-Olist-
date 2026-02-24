@@ -34,19 +34,6 @@ This project follows a structured data analysis workflow:
 The dataset includes a customer_unique_id specifically to identify the real customer across multiple purchases. Without using this field, the business would overcount customers and struggle to measure repeat purchases.
 Because the system creates a new customer ID for every order, the business cannot easily track repeat customers or accurately analyse true customer behaviour.
 
-The query below is used to identify customer_unique_id and the number of orders ordered as qtd_ids
-```sql
-SELECT
-    customer_unique_id,
-    COUNT(DISTINCT customer_id) AS qtd_ids
-FROM customers
-GROUP BY customer_unique_id
-HAVING COUNT(DISTINCT customer_id) > 1;
-
-```
-Output (data sample): 
-<img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
-
 2. **Data Gathering / Collection** For this project, the data was downloaded from the public **Olist Brazilian E-Commerce dataset** on Kaggle. The dataset has 9 CSV files containing information about: customers, orders, products, payments, reviews, sellers, and locations.
 The files were then imported into MySQL to create the initial tables. At this stage, the goal was simply to load the data exactly as provided, without making changes.
 
@@ -67,6 +54,28 @@ The files were then imported into MySQL to create the initial tables. At this st
 
 3. **Data Understanding / Exploration (EDA)**
 
+This query overcounts real customers because the same person can have multiple customer_id values (one per order).
+
+```sql
+SELECT COUNT(DISTINCT customer_id)
+FROM orders; -- Total: 99441
+```
+
+<img width="210" height="97" alt="image" src="https://github.com/user-attachments/assets/3422a9e7-8961-4e94-aac6-57634cd22a95" />
+
+The query below is used to identify customer_unique_id and the number of orders ordered as qtd_ids. 
+
+```sql
+SELECT
+    customer_unique_id,
+    COUNT(DISTINCT customer_id) AS qtd_ids
+FROM customers
+GROUP BY customer_unique_id
+HAVING COUNT(DISTINCT customer_id) > 1;
+
+```
+Output (data sample): 
+<img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
 
 4. **Data Cleaning / Preparation**
 5. **Data Modeling / Analysis**
