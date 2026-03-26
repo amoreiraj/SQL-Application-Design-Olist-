@@ -99,11 +99,11 @@ The data cleaning process has been divided into two phases. Phase 0 (Audiotion) 
 - Phase 0.3 again — Re-run master audit — confirm numbers changed as expected
 
 
-Phase 0: Initial Data Audit (Prior Checks)
+**Phase 0: Initial Data Audit (Prior Checks)**
 
 Perform these checks before making any changes to quantify data quality issues.
 
-1. Identify "Ghost" Orders & Missing Dates
+**1. Identify "Ghost" Orders & Missing Dates**
 
 Why: Finds logical inconsistencies, such as orders marked as 'delivered' that lack a delivery timestamp.
 
@@ -119,7 +119,7 @@ AND order_delivered_customer_date IS NULL;
 <img width="195" height="98" alt="image" src="https://github.com/user-attachments/assets/1dd7981e-d6d4-432c-97d8-a16a20220a8c" />
 
 
-2. Quantify Zero-Value Payments
+**2. Quantify Zero-Value Payments**
    
 Why: Identifies "free" orders (vouchers/credits) to avoid skewing Average Order Value (AOV).
 
@@ -136,7 +136,7 @@ ORDER BY zero_value_count DESC;
 <img width="293" height="163" alt="image" src="https://github.com/user-attachments/assets/04941641-15ca-4a2a-8ac8-57cb4a08acc5" />
 
 
-3. Validate Column Ranges
+**3. Validate Column Ranges**
 Why: Ensures no out-of-range review scores (must be 1–5) or negative financials.
 
 ```sql
