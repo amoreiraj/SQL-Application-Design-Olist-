@@ -23,7 +23,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 
 - [Project Overview](#project-overview)
 - [Dataset](#dataset)
-- [Data Analysis Workflow](#data-analysis-workflow)
+- [The Data Analysis Process](#data-analysis-workflow)
   - [1. Business Understanding](#1-business-understanding)
   - [2. Data Collection](#2-data-collection)
   - [3. Data Exploration — EDA](#3-data-exploration--eda)
