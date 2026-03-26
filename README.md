@@ -67,7 +67,7 @@ The dataset contains 9 CSV files representing a normalised e-commerce schema. Ea
 
 
 --- 
-## the Data Analysis Process:
+## The Data Analysis Process:
 
 <img width="946" height="617" alt="image" src="https://github.com/user-attachments/assets/463750ed-51db-45f3-8976-329aa5f11d43" />
 
@@ -86,7 +86,7 @@ This project follows a structured data analysis workflow:
 
 ### 2. Data Collection
 
-The dataset was downloaded from Kaggle and imported into MySQL Workbench as 9 separate tables. No transformations were applied at import — the goal was to preserve the raw data exactly as provided before beginning any cleaning or analysis.
+The dataset was downloaded from Kaggle and imported into MySQL Workbench as 9 separate tables. No transformations were applied at import, the goal was to preserve the raw data exactly as provided before beginning any cleaning or analysis.
 
 ---
 
