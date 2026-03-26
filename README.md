@@ -1,4 +1,4 @@
-# SQL Application Design — Olist Brazilian E-Commerce
+# SQL Application Design - Olist Brazilian E-Commerce
 
 A relational database design and analysis project built on the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle.
 
