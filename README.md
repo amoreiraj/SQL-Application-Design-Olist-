@@ -133,6 +133,7 @@ ORDER BY zero_value_count DESC;
 
 ```
  **Output:**
+ 
 <img width="293" height="163" alt="image" src="https://github.com/user-attachments/assets/04941641-15ca-4a2a-8ac8-57cb4a08acc5" />
 
 
@@ -144,6 +145,7 @@ Why: Ensures no out-of-range review scores (must be 1–5) or negative financial
 SELECT DISTINCT review_score FROM order_reviews ORDER BY review_score;
 ```
  **Output:**
+ 
 <img width="191" height="65" alt="image" src="https://github.com/user-attachments/assets/de6d35c4-9620-4622-89bb-48a64bf8bc06" />
 
 
@@ -152,10 +154,22 @@ SELECT DISTINCT review_score FROM order_reviews ORDER BY review_score;
 SELECT COUNT(*) FROM order_items WHERE price < 0;```
 ```
 **Output:**
+
 <img width="107" height="82" alt="image" src="https://github.com/user-attachments/assets/5147ed57-2364-43ef-a161-5e125882ea9a" />
 
+---
+** Phase 1: Active Data Cleaning**
 
+**1. Unified Keys & Type Standardisation**
+Why: Standardising IDs to VARCHAR(50) ensures JOIN operations are performant and prevents data loss due to collation or type mismatches across the 9 tables.
 
+```sql
+ALTER TABLE orders MODIFY order_id VARCHAR(50), MODIFY customer_id VARCHAR(50);
+ALTER TABLE order_items MODIFY order_id VARCHAR(50), MODIFY product_id VARCHAR(50), MODIFY seller_id VARCHAR(50);
+ALTER TABLE products MODIFY product_id VARCHAR(50);
+ALTER TABLE sellers MODIFY seller_id VARCHAR(50);
+```
+**Output:**
 
 
 ---
