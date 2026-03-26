@@ -6,6 +6,16 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 
 **Skills demonstrated:** SQL · Database design · ERD · Data cleaning · Exploratory data analysis · Business analysis
 
+<p align="center">
+  <b>Tech & tools used</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white" alt="SQL"/>
+  <img src="https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black" alt="Power BI"/>
+  <img src="https://img.shields.io/badge/Excel-217346?logo=microsoft-excel&logoColor=white" alt="Excel"/> 
+</p>
+
 ---
 
 ## Table of Contents
