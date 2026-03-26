@@ -26,7 +26,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 - [The Data Analysis Process](#the-data-analysis-process)
   - [1. Business Understanding](#1-business-understanding)
   - [2. Data Gathering](#2-data-gathering)
-  - [3. Data Exploration — EDA](#3-data-exploration--eda)
+  - [3. Data Understanding — EDA](#3-data-understanding)
   - [4. Data Cleaning and Preparation](#4-data-cleaning-and-preparation)
     - [Phase 0 — Master Audit](#phase-0--master-audit)
     - [Phase 0.1 — Referential Integrity](#phase-01--referential-integrity-checks)
@@ -284,8 +284,17 @@ ORDER BY review_score;
 
 <img width="200" height="65" alt="image" src="https://github.com/user-attachments/assets/72802fb2-4b30-4f2d-9cf9-ddd9a54b5223" />
 
+
+
 ---
 
 5. **Data Modelling / Analysis**
 6. **Evaluation / Interpretation**
 7. **Reporting / Visualisation / Communication**
+
+
+--- 
+**ER Diagram**
+
+<img width="675" height="896" alt="image" src="https://github.com/user-attachments/assets/9caec884-16db-470f-b820-6055c5eae088" />
+
