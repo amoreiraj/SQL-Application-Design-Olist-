@@ -106,7 +106,9 @@ This phase focused on understanding how customers are represented and validating
 
 <img width="999" height="692" alt="image" src="https://github.com/user-attachments/assets/cd34dd30-5baf-452e-a990-3b540db02846" />
 
-This query overcounts real customers because the same person can have multiple customer_id values (one per order).
+#### Confirming the customer ID problem
+
+This query overcounts real customers because the same person can have multiple customer_id values (one per order). The following query returns 99,441 unique customers, but this count is misleading:
 
 ```sql
 SELECT COUNT(DISTINCT customer_id)
@@ -115,7 +117,8 @@ FROM orders; -- Total: 99441
 
 <img width="210" height="97" alt="image" src="https://github.com/user-attachments/assets/3422a9e7-8961-4e94-aac6-57634cd22a95" />
 
-The following query is used to identify customer_unique_id and the number of orders ordered as qtd_ids. 
+The following query is used to identify customer_unique_id and the number of orders ordered as qtd_ids. The same person receives a different `customer_id` for each order they place. The query below confirms this — it finds customers with more than one `customer_id`, proving that `customer_id` is order-scoped, not person-scoped:
+
 
 ```sql
 SELECT
@@ -129,10 +132,12 @@ HAVING COUNT(DISTINCT customer_id) > 1;
 Output (data sample): 
 <img width="284" height="224" alt="image" src="https://github.com/user-attachments/assets/534cc02d-2276-4631-9ce2-2cbcf9c27f08" />
 
-** The results confirm that some customers have multiple customer_id values, meaning they placed more than one order. This validates that customer_unique_id must be used for accurate customer-level analysis, while customer_id should only be used to join orders.**
+
+**Finding:** Multiple customers have 2 or more `customer_id` values, meaning they placed more than one order. This confirms that `customer_unique_id` must be used for accurate customer counts and repeat purchase analysis.
 
 ---
-4. **Data Cleaning and Preparation**
+
+### 4. Data Cleaning and Preparation
 
 Cleaning is divided into two phases. **Phase 0** audits the data before any changes are made. **Phase 1** applies the actual fixes. A final re-audit in Phase 0.3 confirms the cleaning worked as intended.
 
