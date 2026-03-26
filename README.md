@@ -524,8 +524,6 @@ _In progress_
 
 ## ER Diagram
 
-![Olist Entity Relationship Diagram](https://github.com/user-attachments/assets/OLIST_ERD_22032026.png)
-
 The diagram shows the nine tables and their relationships. Key observations:
 
 - `orders` is the central fact table, it connects directly to `customers`, `order_items`, `order_payments`, and `order_reviews`
