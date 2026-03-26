@@ -90,7 +90,7 @@ The dataset was downloaded from Kaggle and imported into MySQL Workbench as 9 se
 
 ---
 
-### 3. Data Exploration — EDA
+### 3. Data Exploration - EDA
 
 This phase focused on understanding how customers are represented and validating whether key counts were accurate.
 
@@ -277,6 +277,6 @@ ORDER BY review_score;
 
 ---
 
-5. **Data Modeling / Analysis**
+5. **Data Modelling / Analysis**
 6. **Evaluation / Interpretation**
-7. **Reporting / Visualization / Communication**
+7. **Reporting / Visualisation / Communication**
