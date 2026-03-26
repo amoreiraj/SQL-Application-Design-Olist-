@@ -86,6 +86,29 @@ Output (data sample):
 ---
 4. **Data Cleaning / Preparation**
 
+Phase 0: Initial Data Audit (Prior Checks)
+
+Perform these checks before making any changes to quantify data quality issues.
+
+1. Identify "Ghost" Orders & Missing Dates
+
+Why: Finds logical inconsistencies, such as orders marked as 'delivered' that lack a delivery timestamp.
+
+```sql
+SELECT COUNT(*) AS delivered_no_date
+FROM orders
+WHERE order_status = 'delivered'
+AND order_delivered_customer_date IS NULL;
+
+ ```
+ **Output:**
+ 
+<img width="195" height="98" alt="image" src="https://github.com/user-attachments/assets/1dd7981e-d6d4-432c-97d8-a16a20220a8c" />
+
+
+
+
+---
 ```sql
 -- 1. Quantify zero-value payments by type
 SELECT payment_type,
