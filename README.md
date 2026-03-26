@@ -83,6 +83,7 @@ Output (data sample):
 
 ** The results confirm that some customers have multiple customer_id values, meaning they placed more than one order. This validates that customer_unique_id must be used for accurate customer-level analysis, while customer_id should only be used to join orders.**
 
+---
 4. **Data Cleaning / Preparation**
 
 ```sql
@@ -94,7 +95,9 @@ FROM order_payments
 GROUP BY payment_type
 ORDER BY zero_value_count DESC;
 ```
-Output: 
+
+**Output**:
+
 <img width="318" height="154" alt="image" src="https://github.com/user-attachments/assets/24aae013-7fd9-480e-b75a-d3282d3c2605" />
 
 ```sql
@@ -105,6 +108,7 @@ WHERE order_status = 'delivered'
   AND order_delivered_customer_date IS NULL;
 ```
 **Output**:
+
 <img width="198" height="90" alt="image" src="https://github.com/user-attachments/assets/2ba54c29-5f36-4ffb-8d9e-5527aa8ee0af" />
 
 ```sql
@@ -117,7 +121,8 @@ SELECT
     SUM(CASE WHEN order_delivered_customer_date IS NULL THEN 1 ELSE 0 END) AS null_delivery_date
 FROM orders;
 ```
-**Output**
+
+**Output**:
 
 <img width="491" height="85" alt="image" src="https://github.com/user-attachments/assets/0d6bbf77-a529-4a7f-b3d9-f9795e7b7300" />
 
@@ -128,7 +133,7 @@ FROM products
 WHERE product_category_name IS NULL;
 ```
 
-**Output:**
+**Output**:
 
 <img width="199" height="78" alt="image" src="https://github.com/user-attachments/assets/164c77ca-4706-4d83-b1ab-14b8b4949600" />
 
@@ -138,9 +143,12 @@ SELECT DISTINCT review_score
 FROM order_reviews
 ORDER BY review_score;
 ```
-**Output:**
+
+**Output**:
+
 <img width="200" height="65" alt="image" src="https://github.com/user-attachments/assets/72802fb2-4b30-4f2d-9cf9-ddd9a54b5223" />
 
+---
 
 5. **Data Modeling / Analysis**
 6. **Evaluation / Interpretation**
