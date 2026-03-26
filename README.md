@@ -82,8 +82,6 @@ The dataset contains 9 CSV files representing a normalised e-commerce schema. Ea
 
 <img width="946" height="617" alt="image" src="https://github.com/user-attachments/assets/463750ed-51db-45f3-8976-329aa5f11d43" />
 
-This project follows a structured data analysis workflow:
-
 
 ### 1. Business Understanding
 
