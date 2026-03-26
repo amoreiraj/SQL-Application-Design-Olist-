@@ -6,12 +6,24 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 
 **Skills demonstrated:** SQL · Database design · ERD · Data cleaning · Exploratory data analysis · Business analysis
 
-<p align="center">
-  <b>Tech & tools used</b>
-</p>
+## Skills Demonstrated
+[SQL](https://en.wikipedia.org/wiki/SQL) ·  
+[Database Design](https://en.wikipedia.org/wiki/Database_design) ·  
+[Entity–Relationship Diagram (ERD)](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) ·  
+[Data Cleaning](https://en.wikipedia.org/wiki/Data_cleansing) ·  
+[Exploratory Data Analysis (EDA)](https://en.wikipedia.org/wiki/Exploratory_data_analysis) ·  
+[Business Analysis](https://en.wikipedia.org/wiki/Business_analysis)
 
+---
+
+##  Tech & Tools Used
 <p align="center">
   <img src="https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white" alt="SQL"/>
+  <img src="https://img.shields.io/badge/Database%20Design-4B8BBE?logo=databricks&logoColor=white" alt="Database Design"/>
+  <img src="https://img.shields.io/badge/ERD-FF6F61?logo=diagrams.net&logoColor=white" alt="ERD"/>
+  <img src="https://img.shields.io/badge/Data%20Cleaning-6A5ACD?logo=python&logoColor=white" alt="Data Cleaning"/>
+  <img src="https://img.shields.io/badge/EDA-20B2AA?logo=jupyter&logoColor=white" alt="EDA"/>
+  <img src="https://img.shields.io/badge/Business%20Analysis-FFB347?logo=googleanalytics&logoColor=white" alt="Business Analysis"/>
   <img src="https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black" alt="Power BI"/>
   <img src="https://img.shields.io/badge/Excel-217346?logo=microsoft-excel&logoColor=white" alt="Excel"/> 
 </p>
