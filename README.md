@@ -143,7 +143,7 @@ Cleaning is divided into two phases. **Phase 0** audits the data before any chan
 
 ---
 
-- Phase 0 — Master audit — document every number before touching anything
+- Phase 0 — Master audit — Perform all checks before making any changes to the database.
 - Phase 0.1 — Referential integrity checks — find all orphan rows
 - Phase 0.2 — Range and format validation — ghost orders, review scores, negative prices
 - Phase 1 — ALTER TABLE — standardise types across all 9 tables
@@ -155,8 +155,6 @@ Cleaning is divided into two phases. **Phase 0** audits the data before any chan
 
 
 **Phase 0: Initial Data Audit (Prior Checks)**
-
-Perform these checks before making any changes to quantify data quality issues.
 
 **1. Identify "Ghost" Orders & Missing Dates**
 
@@ -173,7 +171,9 @@ AND order_delivered_customer_date IS NULL;
  
 <img width="195" height="98" alt="image" src="https://github.com/user-attachments/assets/1dd7981e-d6d4-432c-97d8-a16a20220a8c" />
 
+**Finding:** A small number of delivered orders have no recorded delivery date. These are flagged as data quality issues and excluded from delivery performance analysis.
 
+---
 **2. Quantify Zero-Value Payments**
    
 Why: Identifies "free" orders (vouchers/credits) to avoid skewing Average Order Value (AOV).
@@ -191,116 +191,347 @@ ORDER BY zero_value_count DESC;
  
 <img width="293" height="163" alt="image" src="https://github.com/user-attachments/assets/04941641-15ca-4a2a-8ac8-57cb4a08acc5" />
 
-
-**3. Validate Column Ranges**
-Why: Ensures no out-of-range review scores (must be 1–5) or negative financials.
-
-```sql
--- Check review score range
-SELECT DISTINCT review_score FROM order_reviews ORDER BY review_score;
-```
- **Output:**
- 
-<img width="191" height="65" alt="image" src="https://github.com/user-attachments/assets/de6d35c4-9620-4622-89bb-48a64bf8bc06" />
-
-
-```sql
--- Check for negative prices
-SELECT COUNT(*) FROM order_items WHERE price < 0;```
-```
-**Output:**
-
-<img width="107" height="82" alt="image" src="https://github.com/user-attachments/assets/5147ed57-2364-43ef-a161-5e125882ea9a" />
+**Finding:** Vouchers are the primary source of zero-value payments. Three rows have `not_defined` as the payment type. Both are documented and excluded from revenue calculations.
 
 ---
-** Phase 1: Active Data Cleaning**
 
-**1. Unified Keys & Type Standardisation**
-Why: Standardising IDs to VARCHAR(50) ensures JOIN operations are performant and prevents data loss due to collation or type mismatches across the 9 tables.
+**3. NULL check across key order columns**
 
 ```sql
-ALTER TABLE orders MODIFY order_id VARCHAR(50), MODIFY customer_id VARCHAR(50);
-ALTER TABLE order_items MODIFY order_id VARCHAR(50), MODIFY product_id VARCHAR(50), MODIFY seller_id VARCHAR(50);
-ALTER TABLE products MODIFY product_id VARCHAR(50);
-ALTER TABLE sellers MODIFY seller_id VARCHAR(50);
-```
-**Output:**
-
-
----
-```sql
--- 1. Quantify zero-value payments by type
-SELECT payment_type,
-       COUNT(*) AS total,
-       COUNT(CASE WHEN payment_value = 0 THEN 1 END) AS zero_value_count
-FROM order_payments
-GROUP BY payment_type
-ORDER BY zero_value_count DESC;
-```
-
-**Output**:
-
-<img width="318" height="154" alt="image" src="https://github.com/user-attachments/assets/24aae013-7fd9-480e-b75a-d3282d3c2605" />
-
-```sql
--- 2. Quantify missing delivery dates
-SELECT COUNT(*) AS delivered_no_date
-FROM orders
-WHERE order_status = 'delivered'
-  AND order_delivered_customer_date IS NULL;
-```
-**Output**:
-
-<img width="198" height="90" alt="image" src="https://github.com/user-attachments/assets/2ba54c29-5f36-4ffb-8d9e-5527aa8ee0af" />
-
-```sql
--- 3. Check for NULLs across key columns
 SELECT
-    SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END)               AS null_order_id,
-    SUM(CASE WHEN customer_id IS NULL THEN 1 ELSE 0 END)            AS null_customer_id,
-    SUM(CASE WHEN order_status IS NULL THEN 1 ELSE 0 END)           AS null_status,
-    SUM(CASE WHEN order_purchase_timestamp IS NULL THEN 1 ELSE 0 END) AS null_purchase_ts,
-    SUM(CASE WHEN order_delivered_customer_date IS NULL THEN 1 ELSE 0 END) AS null_delivery_date
+    SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END)                        AS null_order_id,
+    SUM(CASE WHEN customer_id IS NULL THEN 1 ELSE 0 END)                     AS null_customer_id,
+    SUM(CASE WHEN order_status IS NULL THEN 1 ELSE 0 END)                    AS null_status,
+    SUM(CASE WHEN order_purchase_timestamp IS NULL THEN 1 ELSE 0 END)        AS null_purchase_ts,
+    SUM(CASE WHEN order_delivered_customer_date IS NULL THEN 1 ELSE 0 END)   AS null_delivery_date
 FROM orders;
 ```
 
-**Output**:
+![Output: NULL check on orders](https://github.com/user-attachments/assets/0d6bbf77-a529-4a7f-b3d9-f9795e7b7300)
 
-<img width="491" height="85" alt="image" src="https://github.com/user-attachments/assets/0d6bbf77-a529-4a7f-b3d9-f9795e7b7300" />
+**Finding:** Primary key and status columns are clean. The high count in `null_delivery_date` is expected — non-delivered orders have no delivery date by design.
 
-```SQL
--- 4. Check products with no category
+---
+
+**4. Products with no category**
+
+```sql
 SELECT COUNT(*) AS no_category
 FROM products
 WHERE product_category_name IS NULL;
 ```
 
-**Output**:
+![Output: products with no category](https://github.com/user-attachments/assets/164c77ca-4706-4d83-b1ab-14b8b4949600)
 
-<img width="199" height="78" alt="image" src="https://github.com/user-attachments/assets/164c77ca-4706-4d83-b1ab-14b8b4949600" />
+**Finding:** 610 products have no category name. These are mapped to `'others'` via the translated products view created in Phase 1.3.
+
+---
+
+**5. Review score range validation**
 
 ```sql
--- 5. Check review scores for out-of-range values
 SELECT DISTINCT review_score
 FROM order_reviews
 ORDER BY review_score;
 ```
 
-**Output**:
+![Output: review score range](https://github.com/user-attachments/assets/72802fb2-4b30-4f2d-9cf9-ddd9a54b5223)
 
-<img width="200" height="65" alt="image" src="https://github.com/user-attachments/assets/72802fb2-4b30-4f2d-9cf9-ddd9a54b5223" />
-
-
+**Finding:** All review scores fall within the valid range of 1 to 5. No out-of-range values detected.
 
 ---
 
-5. **Data Modelling / Analysis**
-6. **Evaluation / Interpretation**
-7. **Reporting / Visualisation / Communication**
+**6. Negative price check**
 
+```sql
+SELECT COUNT(*) AS negative_prices
+FROM order_items
+WHERE price < 0;
+```
+<img width="196" height="90" alt="image" src="https://github.com/user-attachments/assets/9764217c-8f65-4c83-bb26-ed865e410aa6" />
 
---- 
-**ER Diagram**
+**Finding:** Zero negative prices. All price values are valid.
 
+---
+#### Phase 0.1 — Referential Integrity Checks
+
+These queries identify orphan rows — records that reference a parent row that does not exist. Orphan rows cause silent JOIN failures.
+
+```sql
+-- Orders with no matching customer
+SELECT COUNT(*) AS orphan_orders
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.customer_id IS NULL;
+
+-- Order items with no matching order
+SELECT COUNT(*) AS orphan_items
+FROM order_items oi
+LEFT JOIN orders o ON oi.order_id = o.order_id
+WHERE o.order_id IS NULL;
+
+-- Order items with no matching product
+SELECT COUNT(*) AS orphan_products
+FROM order_items oi
+LEFT JOIN products p ON oi.product_id = p.product_id
+WHERE p.product_id IS NULL;
+
+-- Order items with no matching seller
+SELECT COUNT(*) AS orphan_sellers
+FROM order_items oi
+LEFT JOIN sellers s ON oi.seller_id = s.seller_id
+WHERE s.seller_id IS NULL;
+
+-- Payments with no matching order
+SELECT COUNT(*) AS orphan_payments
+FROM order_payments op
+LEFT JOIN orders o ON op.order_id = o.order_id
+WHERE o.order_id IS NULL;
+
+-- Reviews with no matching order
+SELECT COUNT(*) AS orphan_reviews
+FROM order_reviews r
+LEFT JOIN orders o ON r.order_id = o.order_id
+WHERE o.order_id IS NULL;
+```
+
+---
+#### Phase 0.2 — Range and Format Validation
+
+This audit checks for hidden empty strings, cells that appear blank but are stored as `''` rather than `NULL`. Standard `IS NULL` checks miss these entirely.
+
+```sql
+-- Customers table
+SELECT
+    SUM(CASE WHEN TRIM(customer_city)  = '' THEN 1 ELSE 0 END) AS city_empty,
+    SUM(CASE WHEN customer_city IS NULL     THEN 1 ELSE 0 END) AS city_null,
+    SUM(CASE WHEN TRIM(customer_state) = '' THEN 1 ELSE 0 END) AS state_empty,
+    SUM(CASE WHEN customer_state IS NULL    THEN 1 ELSE 0 END) AS state_null
+FROM customers;
+
+-- Products table
+SELECT
+    SUM(CASE WHEN TRIM(product_category_name) = '' THEN 1 ELSE 0 END) AS category_empty,
+    SUM(CASE WHEN product_category_name IS NULL    THEN 1 ELSE 0 END) AS category_null
+FROM products;
+
+-- Reviews table
+SELECT
+    SUM(CASE WHEN TRIM(review_comment_title)   = '' THEN 1 ELSE 0 END) AS title_empty,
+    SUM(CASE WHEN TRIM(review_comment_message) = '' THEN 1 ELSE 0 END) AS message_empty,
+    SUM(CASE WHEN review_score IS NULL              THEN 1 ELSE 0 END) AS score_null
+FROM order_reviews;
+
+-- Sellers table
+SELECT
+    SUM(CASE WHEN TRIM(seller_city)  = '' THEN 1 ELSE 0 END) AS city_empty,
+    SUM(CASE WHEN seller_city IS NULL    THEN 1 ELSE 0 END) AS city_null,
+    SUM(CASE WHEN TRIM(seller_state) = '' THEN 1 ELSE 0 END) AS state_empty,
+    SUM(CASE WHEN seller_state IS NULL   THEN 1 ELSE 0 END) AS state_null
+FROM sellers;
+```
+
+---
+
+#### Phase 1 — Type Standardisation
+
+All ID columns are confirmed as `CHAR(32)` — the correct type for 32-character UUID hashes. No `ALTER TABLE` was required. This was validated using `DESCRIBE` on each table and confirmed by the absence of join failures during EDA.
+
+> **Decision:** Skipping `ALTER TABLE` on ID columns. All keys are already `CHAR(32)`, which is appropriate for UUIDs of this format. Changing to `VARCHAR(50)` would require dropping and recreating all foreign key constraints with no practical benefit for this dataset.
+
+---
+
+#### Phase 1.1 — Convert Blanks to NULL
+
+CSV imports often store empty cells as `''` rather than `NULL`. This causes aggregate functions like `AVG()` and `COUNT()` to behave incorrectly, and breaks `COALESCE` smart defaults. All identified empty strings are converted to `NULL`.
+
+```sql
+-- Orders
+UPDATE orders
+SET order_status = NULL
+WHERE TRIM(order_status) = '';
+
+-- Products
+UPDATE products
+SET product_category_name = NULL
+WHERE TRIM(product_category_name) = '';
+
+-- Customers
+UPDATE customers SET customer_city  = NULL WHERE TRIM(customer_city)  = '';
+UPDATE customers SET customer_state = NULL WHERE TRIM(customer_state) = '';
+
+-- Sellers
+UPDATE sellers SET seller_city  = NULL WHERE TRIM(seller_city)  = '';
+UPDATE sellers SET seller_state = NULL WHERE TRIM(seller_state) = '';
+
+-- Reviews
+UPDATE order_reviews SET review_comment_title   = NULL WHERE TRIM(review_comment_title)   = '';
+UPDATE order_reviews SET review_comment_message = NULL WHERE TRIM(review_comment_message) = '';
+```
+
+---
+
+#### Phase 1.2 — Trim Whitespace
+
+Leading or trailing spaces in ID and category columns cause silent join failures — two values that look identical in a query result may not match because one has a hidden space.
+
+```sql
+-- Trim product IDs and category names
+UPDATE products
+SET product_id            = TRIM(product_id),
+    product_category_name = TRIM(product_category_name);
+
+-- Trim and standardise state codes to uppercase
+UPDATE customers SET customer_state = TRIM(UPPER(customer_state));
+UPDATE sellers   SET seller_state   = TRIM(UPPER(seller_state));
+```
+
+---
+
+#### Phase 1.3 — Create Cleaned Views
+
+Rather than modifying the raw tables, cleaned and enriched versions are exposed as views. This preserves the original data while providing clean, analysis-ready references.
+
+```sql
+-- View 1: Products with English category names
+-- 610 NULL categories are mapped to 'others'
+CREATE VIEW v_products_translated AS
+SELECT
+    p.product_id,
+    COALESCE(t.product_category_name_english, 'others') AS category_en
+FROM products p
+LEFT JOIN product_category_translation t
+    ON p.product_category_name = t.product_category_name;
+
+-- View 2: Deduplicated reviews
+-- Keeps only the most recent review per order
+-- Prevents double-counting of sentiment in aggregate queries
+CREATE VIEW v_reviews_deduped AS
+SELECT r.*
+FROM order_reviews r
+INNER JOIN (
+    SELECT order_id, MAX(review_creation_date) AS latest
+    FROM order_reviews
+    GROUP BY order_id
+) latest_r
+    ON  r.order_id            = latest_r.order_id
+    AND r.review_creation_date = latest_r.latest;
+
+-- Table 3: Normalised geolocation (1 row per zip code prefix)
+-- The raw geolocation table has ~1M rows with multiple coordinates per prefix.
+-- Averaging lat/lng creates a single representative point per prefix,
+-- preventing a row explosion when joining to customers or sellers.
+CREATE TABLE geo_clean AS
+SELECT
+    geolocation_zip_code_prefix,
+    AVG(geolocation_lat)           AS avg_lat,
+    AVG(geolocation_lng)           AS avg_lng,
+    TRIM(UPPER(geolocation_city))  AS city,
+    TRIM(UPPER(geolocation_state)) AS state
+FROM geolocation
+GROUP BY geolocation_zip_code_prefix;
+```
+
+---
+
+#### Phase 1.4 — Feature Engineering
+
+New calculated columns are created to support delivery performance analysis. These are exposed as a view rather than modifying the base table.
+
+```sql
+-- Delivery performance view
+-- delivery_delta_days: positive = late, negative = early, 0 = exactly on time
+CREATE VIEW v_delivery_performance AS
+SELECT
+    order_id,
+    order_status,
+    order_purchase_timestamp,
+    order_delivered_customer_date,
+    order_estimated_delivery_date,
+    DATEDIFF(
+        order_delivered_customer_date,
+        order_estimated_delivery_date
+    ) AS delivery_delta_days,
+    CASE
+        WHEN order_delivered_customer_date <= order_estimated_delivery_date
+            THEN 'On time'
+        WHEN DATEDIFF(
+                order_delivered_customer_date,
+                order_estimated_delivery_date
+             ) <= 3
+            THEN 'Slightly late'
+        ELSE 'Significantly late'
+    END AS delivery_status
+FROM orders
+WHERE order_status = 'delivered'
+  AND order_delivered_customer_date IS NOT NULL;
+```
+
+---
+
+#### Phase 0.3 — Post-Cleaning Audit
+
+Re-run the master audit after all Phase 1 steps to confirm the cleaning worked as expected. Numbers should reflect what was changed.
+
+```sql
+SELECT
+    'orders' AS tbl,
+    COUNT(*) AS total_rows,
+    SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) AS null_pk,
+    SUM(CASE WHEN order_status IS NULL
+              OR TRIM(order_status) = '' THEN 1 ELSE 0 END) AS bad_status,
+    SUM(CASE WHEN order_delivered_customer_date IS NULL
+             AND order_status = 'delivered' THEN 1 ELSE 0 END) AS ghost_deliveries
+FROM orders
+UNION ALL
+SELECT
+    'products',
+    COUNT(*),
+    SUM(CASE WHEN product_id IS NULL THEN 1 ELSE 0 END),
+    SUM(CASE WHEN product_category_name IS NULL THEN 1 ELSE 0 END),
+    SUM(CASE WHEN TRIM(product_category_name) = '' THEN 1 ELSE 0 END)
+FROM products
+UNION ALL
+SELECT
+    'order_reviews',
+    COUNT(*),
+    SUM(CASE WHEN review_id IS NULL THEN 1 ELSE 0 END),
+    SUM(CASE WHEN review_score IS NULL THEN 1 ELSE 0 END),
+    SUM(CASE WHEN TRIM(review_comment_message) = '' THEN 1 ELSE 0 END)
+FROM order_reviews;
+```
+
+---
+
+### 5. Data Modelling and Analysis
+
+_In progress_
+
+---
+
+### 6. Evaluation and Interpretation
+
+_In progress_
+
+---
+
+### 7. Reporting and Visualisation
+
+_In progress_
+
+---
+
+## ER Diagram
+
+![Olist Entity Relationship Diagram](https://github.com/user-attachments/assets/OLIST_ERD_22032026.png)
+
+The diagram shows the nine tables and their relationships. Key observations:
+
+- `orders` is the central fact table — it connects directly to `customers`, `order_items`, `order_payments`, and `order_reviews`
+- `order_items` connects to `products` and `sellers`
+- `products` connects to `product_category_translation` for English category names
+- `geolocation` has no formal foreign key — it is a lookup table joined via `zip_code_prefix`
+
+---
 <img width="675" height="896" alt="image" src="https://github.com/user-attachments/assets/9caec884-16db-470f-b820-6055c5eae088" />
 
