@@ -6,17 +6,8 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 
 **Skills demonstrated:** SQL · Database design · ERD · Data cleaning · Exploratory data analysis · Business analysis
 
-## Skills Demonstrated
-[SQL](https://en.wikipedia.org/wiki/SQL) ·  
-[Database Design](https://en.wikipedia.org/wiki/Database_design) ·  
-[Entity–Relationship Diagram (ERD)](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) ·  
-[Data Cleaning](https://en.wikipedia.org/wiki/Data_cleansing) ·  
-[Exploratory Data Analysis (EDA)](https://en.wikipedia.org/wiki/Exploratory_data_analysis) ·  
-[Business Analysis](https://en.wikipedia.org/wiki/Business_analysis)
+## Skills and Tools Used: 
 
----
-
-##  Tech & Tools Used
 <p align="center">
   <img src="https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white" alt="SQL"/>
   <img src="https://img.shields.io/badge/Database%20Design-4B8BBE?logo=databricks&logoColor=white" alt="Database Design"/>
