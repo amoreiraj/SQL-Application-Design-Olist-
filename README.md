@@ -84,6 +84,64 @@ Output (data sample):
 ** The results confirm that some customers have multiple customer_id values, meaning they placed more than one order. This validates that customer_unique_id must be used for accurate customer-level analysis, while customer_id should only be used to join orders.**
 
 4. **Data Cleaning / Preparation**
+
+```sql
+-- 1. Quantify zero-value payments by type
+SELECT payment_type,
+       COUNT(*) AS total,
+       COUNT(CASE WHEN payment_value = 0 THEN 1 END) AS zero_value_count
+FROM order_payments
+GROUP BY payment_type
+ORDER BY zero_value_count DESC;
+```
+Output: 
+<img width="318" height="154" alt="image" src="https://github.com/user-attachments/assets/24aae013-7fd9-480e-b75a-d3282d3c2605" />
+
+```sql
+-- 2. Quantify missing delivery dates
+SELECT COUNT(*) AS delivered_no_date
+FROM orders
+WHERE order_status = 'delivered'
+  AND order_delivered_customer_date IS NULL;
+```
+**Output**:
+<img width="198" height="90" alt="image" src="https://github.com/user-attachments/assets/2ba54c29-5f36-4ffb-8d9e-5527aa8ee0af" />
+
+```sql
+-- 3. Check for NULLs across key columns
+SELECT
+    SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END)               AS null_order_id,
+    SUM(CASE WHEN customer_id IS NULL THEN 1 ELSE 0 END)            AS null_customer_id,
+    SUM(CASE WHEN order_status IS NULL THEN 1 ELSE 0 END)           AS null_status,
+    SUM(CASE WHEN order_purchase_timestamp IS NULL THEN 1 ELSE 0 END) AS null_purchase_ts,
+    SUM(CASE WHEN order_delivered_customer_date IS NULL THEN 1 ELSE 0 END) AS null_delivery_date
+FROM orders;
+```
+**Output**
+
+<img width="491" height="85" alt="image" src="https://github.com/user-attachments/assets/0d6bbf77-a529-4a7f-b3d9-f9795e7b7300" />
+
+```SQL
+-- 4. Check products with no category
+SELECT COUNT(*) AS no_category
+FROM products
+WHERE product_category_name IS NULL;
+```
+
+**Output:**
+
+<img width="199" height="78" alt="image" src="https://github.com/user-attachments/assets/164c77ca-4706-4d83-b1ab-14b8b4949600" />
+
+```sql
+-- 5. Check review scores for out-of-range values
+SELECT DISTINCT review_score
+FROM order_reviews
+ORDER BY review_score;
+```
+**Output:**
+<img width="200" height="65" alt="image" src="https://github.com/user-attachments/assets/72802fb2-4b30-4f2d-9cf9-ddd9a54b5223" />
+
+
 5. **Data Modeling / Analysis**
 6. **Evaluation / Interpretation**
 7. **Reporting / Visualization / Communication**
