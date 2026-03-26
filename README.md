@@ -86,6 +86,19 @@ Output (data sample):
 ---
 4. **Data Cleaning / Preparation**
 
+The data cleaning process has been divided into two phases. Phase 0 (Audiotion) is divided into smaller sessions ranging from Phase 0 to Phase 0.3, and Phase 1 (Cleaning) goes from Phase 1 to Phase 1.4.
+
+- Phase 0 — Master audit — document every number before touching anything
+- Phase 0.1 — Referential integrity checks — find all orphan rows
+- Phase 0.2 — Range and format validation — ghost orders, review scores, negative prices
+- Phase 1 — ALTER TABLE — standardise types across all 9 tables
+- Phase 1.1 — Convert blanks to NULL — all tables, all text columns
+- Phase 1.2 — TRIM whitespace — IDs and category strings
+- Phase 1.3 — Create views — v_products_translated, v_reviews_deduped, olist_geo_clean
+- Phase 1.4 — Feature engineering — delivery_delta_days and delivery_status
+- Phase 0.3 again — Re-run master audit — confirm numbers changed as expected
+
+
 Phase 0: Initial Data Audit (Prior Checks)
 
 Perform these checks before making any changes to quantify data quality issues.
@@ -104,6 +117,43 @@ AND order_delivered_customer_date IS NULL;
  **Output:**
  
 <img width="195" height="98" alt="image" src="https://github.com/user-attachments/assets/1dd7981e-d6d4-432c-97d8-a16a20220a8c" />
+
+
+2. Quantify Zero-Value Payments
+   
+Why: Identifies "free" orders (vouchers/credits) to avoid skewing Average Order Value (AOV).
+
+```sql
+SELECT payment_type,
+       COUNT(*) AS total,
+       COUNT(CASE WHEN payment_value = 0 THEN 1 END) AS zero_value_count
+FROM olist_order_payments_dataset
+GROUP BY payment_type
+ORDER BY zero_value_count DESC;
+
+```
+ **Output:**
+<img width="293" height="163" alt="image" src="https://github.com/user-attachments/assets/04941641-15ca-4a2a-8ac8-57cb4a08acc5" />
+
+
+3. Validate Column Ranges
+Why: Ensures no out-of-range review scores (must be 1–5) or negative financials.
+
+```sql
+-- Check review score range
+SELECT DISTINCT review_score FROM order_reviews ORDER BY review_score;
+```
+ **Output:**
+<img width="191" height="65" alt="image" src="https://github.com/user-attachments/assets/de6d35c4-9620-4622-89bb-48a64bf8bc06" />
+
+
+```sql
+-- Check for negative prices
+SELECT COUNT(*) FROM order_items WHERE price < 0;```
+```
+**Output:**
+<img width="107" height="82" alt="image" src="https://github.com/user-attachments/assets/5147ed57-2364-43ef-a161-5e125882ea9a" />
+
 
 
 
