@@ -26,17 +26,17 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 - [The Data Analysis Process](#the-data-analysis-process)
   - [1. Business Understanding](#1-business-understanding)
   - [2. Data Gathering](#2-data-gathering)
-  - [3. Data Understanding — EDA](#3-data-understanding)
+  - [3. Data Understanding , EDA](#3-data-understanding)
   - [4. Data Cleaning and Preparation](#4-data-cleaning-and-preparation)
-    - [Phase 0 — Master Audit](#phase-0--master-audit)
-    - [Phase 0.1 — Referential Integrity](#phase-01--referential-integrity-checks)
-    - [Phase 0.2 — Range and Format Validation](#phase-02--range-and-format-validation)
-    - [Phase 1 — Type Standardisation](#phase-1--type-standardisation)
-    - [Phase 1.1 — Convert Blanks to NULL](#phase-11--convert-blanks-to-null)
-    - [Phase 1.2 — Trim Whitespace](#phase-12--trim-whitespace)
-    - [Phase 1.3 — Create Cleaned Views](#phase-13--create-cleaned-views)
-    - [Phase 1.4 — Feature Engineering](#phase-14--feature-engineering)
-    - [Phase 0.3 — Post-Cleaning Audit](#phase-03--post-cleaning-audit)
+    - [Phase 0 , Master Audit](#phase-0--master-audit)
+    - [Phase 0.1 , Referential Integrity](#phase-01--referential-integrity-checks)
+    - [Phase 0.2 , Range and Format Validation](#phase-02--range-and-format-validation)
+    - [Phase 1 , Type Standardisation](#phase-1--type-standardisation)
+    - [Phase 1.1 , Convert Blanks to NULL](#phase-11--convert-blanks-to-null)
+    - [Phase 1.2 , Trim Whitespace](#phase-12--trim-whitespace)
+    - [Phase 1.3 , Create Cleaned Views](#phase-13--create-cleaned-views)
+    - [Phase 1.4 , Feature Engineering](#phase-14--feature-engineering)
+    - [Phase 0.3 , Post-Cleaning Audit](#phase-03--post-cleaning-audit)
   - [5. Data Modelling and Analysis](#5-data-modelling-and-analysis)
   - [6. Evaluation and Interpretation](#6-evaluation-and-interpretation)
   - [7. Reporting and Visualisation](#7-reporting-and-visualisation)
@@ -117,7 +117,7 @@ FROM orders; -- Total: 99441
 
 <img width="210" height="97" alt="image" src="https://github.com/user-attachments/assets/3422a9e7-8961-4e94-aac6-57634cd22a95" />
 
-The following query is used to identify customer_unique_id and the number of orders ordered as qtd_ids. The same person receives a different `customer_id` for each order they place. The query below confirms this — it finds customers with more than one `customer_id`, proving that `customer_id` is order-scoped, not person-scoped:
+The following query is used to identify customer_unique_id and the number of orders ordered as qtd_ids. The same person receives a different `customer_id` for each order they place. The query below confirms this , it finds customers with more than one `customer_id`, proving that `customer_id` is order-scoped, not person-scoped:
 
 
 ```sql
@@ -143,15 +143,15 @@ Cleaning is divided into two phases. **Phase 0** audits the data before any chan
 
 ---
 
-- Phase 0 — Master audit — Perform all checks before making any changes to the database.
-- Phase 0.1 — Referential integrity checks — find all orphan rows
-- Phase 0.2 — Range and format validation — ghost orders, review scores, negative prices
-- Phase 1 — ALTER TABLE — standardise types across all 9 tables
-- Phase 1.1 — Convert blanks to NULL — all tables, all text columns
-- Phase 1.2 — TRIM whitespace — IDs and category strings
-- Phase 1.3 — Create views — v_products_translated, v_reviews_deduped, olist_geo_clean
-- Phase 1.4 — Feature engineering — delivery_delta_days and delivery_status
-- Phase 0.3 again — Re-run master audit — confirm numbers changed as expected
+- Phase 0 , Master audit , Perform all checks before making any changes to the database.
+- Phase 0.1 , Referential integrity checks , find all orphan rows
+- Phase 0.2 , Range and format validation , ghost orders, review scores, negative prices
+- Phase 1 , ALTER TABLE , standardise types across all 9 tables
+- Phase 1.1 , Convert blanks to NULL , all tables, all text columns
+- Phase 1.2 , TRIM whitespace , IDs and category strings
+- Phase 1.3 , Create views , v_products_translated, v_reviews_deduped, olist_geo_clean
+- Phase 1.4 , Feature engineering , delivery_delta_days and delivery_status
+- Phase 0.3 again , Re-run master audit , confirm numbers changed as expected
 
 
 **Phase 0: Initial Data Audit (Prior Checks)**
@@ -209,7 +209,7 @@ FROM orders;
 
 ![Output: NULL check on orders](https://github.com/user-attachments/assets/0d6bbf77-a529-4a7f-b3d9-f9795e7b7300)
 
-**Finding:** Primary key and status columns are clean. The high count in `null_delivery_date` is expected — non-delivered orders have no delivery date by design.
+**Finding:** Primary key and status columns are clean. The high count in `null_delivery_date` is expected , non-delivered orders have no delivery date by design.
 
 ---
 
@@ -253,9 +253,9 @@ WHERE price < 0;
 **Finding:** Zero negative prices. All price values are valid.
 
 ---
-#### Phase 0.1 — Referential Integrity Checks
+#### Phase 0.1 - Referential Integrity Checks
 
-These queries identify orphan rows — records that reference a parent row that does not exist. Orphan rows cause silent JOIN failures.
+These queries identify orphan rows, records that reference a parent row that does not exist. Orphan rows cause silent JOIN failures.
 
 ```sql
 -- Orders with no matching customer
@@ -296,7 +296,7 @@ WHERE o.order_id IS NULL;
 ```
 
 ---
-#### Phase 0.2 — Range and Format Validation
+#### Phase 0.2 - Range and Format Validation
 
 This audit checks for hidden empty strings, cells that appear blank but are stored as `''` rather than `NULL`. Standard `IS NULL` checks miss these entirely.
 
@@ -333,15 +333,15 @@ FROM sellers;
 
 ---
 
-#### Phase 1 — Type Standardisation
+#### Phase 1 - Type Standardisation
 
-All ID columns are confirmed as `CHAR(32)` — the correct type for 32-character UUID hashes. No `ALTER TABLE` was required. This was validated using `DESCRIBE` on each table and confirmed by the absence of join failures during EDA.
+All ID columns are confirmed as `CHAR(32)`, the correct type for 32-character UUID hashes. No `ALTER TABLE` was required. This was validated using `DESCRIBE` on each table and confirmed by the absence of join failures during EDA.
 
 > **Decision:** Skipping `ALTER TABLE` on ID columns. All keys are already `CHAR(32)`, which is appropriate for UUIDs of this format. Changing to `VARCHAR(50)` would require dropping and recreating all foreign key constraints with no practical benefit for this dataset.
 
 ---
 
-#### Phase 1.1 — Convert Blanks to NULL
+#### Phase 1.1 - Convert Blanks to NULL
 
 CSV imports often store empty cells as `''` rather than `NULL`. This causes aggregate functions like `AVG()` and `COUNT()` to behave incorrectly, and breaks `COALESCE` smart defaults. All identified empty strings are converted to `NULL`.
 
@@ -371,9 +371,9 @@ UPDATE order_reviews SET review_comment_message = NULL WHERE TRIM(review_comment
 
 ---
 
-#### Phase 1.2 — Trim Whitespace
+#### Phase 1.2 - Trim Whitespace
 
-Leading or trailing spaces in ID and category columns cause silent join failures — two values that look identical in a query result may not match because one has a hidden space.
+Leading or trailing spaces in ID and category columns cause silent join failures, two values that look identical in a query result may not match because one has a hidden space.
 
 ```sql
 -- Trim product IDs and category names
@@ -388,7 +388,7 @@ UPDATE sellers   SET seller_state   = TRIM(UPPER(seller_state));
 
 ---
 
-#### Phase 1.3 — Create Cleaned Views
+#### Phase 1.3 - Create Cleaned Views
 
 Rather than modifying the raw tables, cleaned and enriched versions are exposed as views. This preserves the original data while providing clean, analysis-ready references.
 
@@ -434,7 +434,7 @@ GROUP BY geolocation_zip_code_prefix;
 
 ---
 
-#### Phase 1.4 — Feature Engineering
+#### Phase 1.4 - Feature Engineering
 
 New calculated columns are created to support delivery performance analysis. These are exposed as a view rather than modifying the base table.
 
@@ -469,7 +469,7 @@ WHERE order_status = 'delivered'
 
 ---
 
-#### Phase 0.3 — Post-Cleaning Audit
+#### Phase 0.3 - Post-Cleaning Audit
 
 Re-run the master audit after all Phase 1 steps to confirm the cleaning worked as expected. Numbers should reflect what was changed.
 
@@ -527,10 +527,10 @@ _In progress_
 
 The diagram shows the nine tables and their relationships. Key observations:
 
-- `orders` is the central fact table — it connects directly to `customers`, `order_items`, `order_payments`, and `order_reviews`
+- `orders` is the central fact table, it connects directly to `customers`, `order_items`, `order_payments`, and `order_reviews`
 - `order_items` connects to `products` and `sellers`
 - `products` connects to `product_category_translation` for English category names
-- `geolocation` has no formal foreign key — it is a lookup table joined via `zip_code_prefix`
+- `geolocation` has no formal foreign key, it is a lookup table joined via `zip_code_prefix`
 
 ---
 <img width="675" height="896" alt="image" src="https://github.com/user-attachments/assets/9caec884-16db-470f-b820-6055c5eae088" />
