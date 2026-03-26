@@ -4,9 +4,7 @@ A relational database design and analysis project built on the [Olist Brazilian 
 
 The goal was to move beyond writing isolated queries and learn to think like a database designer, importing raw CSV files, normalising them into a relational schema in MySQL, generating an ER diagram, and writing business queries grounded in real table relationships.
 
-**Skills demonstrated:** SQL · Database design · ERD · Data cleaning · Exploratory data analysis · Business analysis
-
-## Skills and Tools Used: 
+**Skills and tools used:**
 
 <p align="center">
   <img src="https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white" alt="SQL"/>
