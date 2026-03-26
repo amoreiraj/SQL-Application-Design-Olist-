@@ -40,7 +40,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
   - [5. Data Modelling and Analysis](#5-data-modelling-and-analysis)
   - [6. Evaluation and Interpretation](#6-evaluation-and-interpretation)
   - [7. Reporting and Visualisation](#7-reporting-and-visualisation)
-- [ER Diagram](#er-diagram)
+- [8. ER Diagram](#er-diagram)
 - [Temporal Coverage](#temporal-coverage)
 
 ---
