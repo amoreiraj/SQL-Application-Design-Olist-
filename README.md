@@ -7,7 +7,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
                                                    **Skills and tools used:**
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white" alt="SQL"/>
+  <img src="https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white" alt="MySQL"/>
   <img src="https://img.shields.io/badge/Database%20Design-4B8BBE?logo=databricks&logoColor=white" alt="Database Design"/>
   <img src="https://img.shields.io/badge/ERD-FF6F61?logo=diagrams.net&logoColor=white" alt="ERD"/>
   <img src="https://img.shields.io/badge/Data%20Cleaning-6A5ACD?logo=python&logoColor=white" alt="Data Cleaning"/>
