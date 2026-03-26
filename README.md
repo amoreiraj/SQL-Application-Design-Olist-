@@ -1,44 +1,55 @@
-# SQL-Application-Design-Olist
+# SQL Application Design — Olist Brazilian E-Commerce
 
-SQL project focused on relational database design using the **Olist Brazilian E-Commerce dataset** (Kaggle): https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+A relational database design and analysis project built on the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle.
 
-**Main Goal**: Shift from writing isolated queries to designing databases
-- import raw CSVs
-- normalise data into a relational schema in MySQL
-- generate ER diagram
-- write business queries based on the ERD relationships.
+The goal was to move beyond writing isolated queries and learn to think like a database designer, importing raw CSV files, normalising them into a relational schema in MySQL, generating an ER diagram, and writing business queries grounded in real table relationships.
 
-**Covers**: 
-- ERD creation in MySQL Workbench
--  multi-table joins
--  aggregates
--  subqueries
--  functions
--  real-world e-commerce analysis (revenue, delivery, customer behaviour).
+**Skills demonstrated:** SQL · Database design · ERD · Data cleaning · Exploratory data analysis · Business analysis
 
-Portfolio showcase for **SQL**, **database design**, and **data analysis** skills.
+---
 
- ---- 
-## Temporal Coverage
-- **Start Date**: 01/01/2017
-- **End Date**: 06/01/2018
+## Table of Contents
 
---- 
-## the Data Analysis Process:
+- [Project Overview](#project-overview)
+- [Dataset](#dataset)
+- [Data Analysis Workflow](#data-analysis-workflow)
+  - [1. Business Understanding](#1-business-understanding)
+  - [2. Data Collection](#2-data-collection)
+  - [3. Data Exploration — EDA](#3-data-exploration--eda)
+  - [4. Data Cleaning and Preparation](#4-data-cleaning-and-preparation)
+    - [Phase 0 — Master Audit](#phase-0--master-audit)
+    - [Phase 0.1 — Referential Integrity](#phase-01--referential-integrity-checks)
+    - [Phase 0.2 — Range and Format Validation](#phase-02--range-and-format-validation)
+    - [Phase 1 — Type Standardisation](#phase-1--type-standardisation)
+    - [Phase 1.1 — Convert Blanks to NULL](#phase-11--convert-blanks-to-null)
+    - [Phase 1.2 — Trim Whitespace](#phase-12--trim-whitespace)
+    - [Phase 1.3 — Create Cleaned Views](#phase-13--create-cleaned-views)
+    - [Phase 1.4 — Feature Engineering](#phase-14--feature-engineering)
+    - [Phase 0.3 — Post-Cleaning Audit](#phase-03--post-cleaning-audit)
+  - [5. Data Modelling and Analysis](#5-data-modelling-and-analysis)
+  - [6. Evaluation and Interpretation](#6-evaluation-and-interpretation)
+  - [7. Reporting and Visualisation](#7-reporting-and-visualisation)
+- [ER Diagram](#er-diagram)
+- [Temporal Coverage](#temporal-coverage)
 
-<img width="946" height="617" alt="image" src="https://github.com/user-attachments/assets/463750ed-51db-45f3-8976-329aa5f11d43" />
+---
 
-This project follows a structured data analysis workflow:
+## Project Overview
 
-1. **Define the Problem / Business Understanding** The system was designed so that each order is assigned a unique customer_id. As a result, the same person receives a different ID every time they place a new order. This makes each purchase appear to come from a different customer.
-The dataset includes a customer_unique_id specifically to identify the real customer across multiple purchases. Without using this field, the business would overcount customers and struggle to measure repeat purchases.
-Because the system creates a new customer ID for every order, the business cannot easily track repeat customers or accurately analyse true customer behaviour.
+| Item | Detail |
+|------|--------|
+| **Dataset** | Olist Brazilian E-Commerce (Kaggle) |
+| **Database** | MySQL via MySQL Workbench |
+| **Tables** | 9 (normalised from raw CSV files) |
+| **Rows** | ~500k across all tables |
+| **Period covered** | 1 January 2017 – 31 August 2018 |
+| **Focus** | Database design · data cleaning · business analysis |
 
-2. **Data Gathering / Collection** For this project, the data was downloaded from the public **Olist Brazilian E-Commerce dataset** on Kaggle. The dataset has 9 CSV files containing information about: customers, orders, products, payments, reviews, sellers, and locations.
-The files were then imported into MySQL to create the initial tables. At this stage, the goal was simply to load the data exactly as provided, without making changes.
+---
 
-- The Olist dataset has 9 main CSV files that naturally become tables. Key ones:
+## Dataset
 
+The dataset contains 9 CSV files representing a normalised e-commerce schema. Each file maps directly to a table in MySQL.
 
 | File                                      | Table Name                     | Key Columns / Purpose                                                                 | Approx. Rows |
 |-------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------|--------------|
@@ -50,11 +61,38 @@ The files were then imported into MySQL to create the initial tables. At this st
 | olist_order_reviews_dataset.csv           | order_reviews                  | review_id, order_id, review_score (1–5), comment_title/message, creation/answer dates | ~99k         |
 | olist_products_dataset.csv                | products                       | product_id, category_name, dimensions, weight, photos_qty, description_length         | ~33k         |
 | product_category_name_translation.csv     | product_category_translation   | product_category_name (PT), product_category_name_english (EN)                        | 71           |
-| olist_sellers_dataset.csv                 | sellers                        | seller_id, zip_code_prefix, city, state                                               | ~3k          |
+| olist_sellers_dataset.csv                 | sellers                        | seller_id, zip_code_prefix, city, state                                               | ~3k          
 
-3. **Data Understanding / Exploration (EDA)**
+> **Note on geolocation:** This table is a lookup reference, not a relational table. One zip code prefix maps to multiple lat/lng coordinates, so it has no formal foreign key relationship. It is joined via `zip_code_prefix` using averaged coordinates after normalisation in Phase 1.3.
 
-tIME to understand the data. This phase focused on understanding how customers are represented in the data and validating whether customer counts are accurate.
+
+--- 
+## the Data Analysis Process:
+
+<img width="946" height="617" alt="image" src="https://github.com/user-attachments/assets/463750ed-51db-45f3-8976-329aa5f11d43" />
+
+This project follows a structured data analysis workflow:
+
+
+### 1. Business Understanding
+
+**Problem identified:** The Olist system assigns a new `customer_id` to the same person every time they place an order. This means a single real customer appears as multiple distinct customers in the database.
+
+**Impact:** Any analysis using `customer_id` to count customers will overcount real customers and cannot measure repeat purchase behaviour.
+
+**Decision:** All customer-level analysis in this project uses `customer_unique_id`. The `customer_id` column is used only to join the `orders` and `customers` tables.
+
+---
+
+### 2. Data Collection
+
+The dataset was downloaded from Kaggle and imported into MySQL Workbench as 9 separate tables. No transformations were applied at import — the goal was to preserve the raw data exactly as provided before beginning any cleaning or analysis.
+
+---
+
+### 3. Data Exploration — EDA
+
+This phase focused on understanding how customers are represented and validating whether key counts were accurate.
 
 <img width="999" height="692" alt="image" src="https://github.com/user-attachments/assets/cd34dd30-5baf-452e-a990-3b540db02846" />
 
@@ -67,7 +105,7 @@ FROM orders; -- Total: 99441
 
 <img width="210" height="97" alt="image" src="https://github.com/user-attachments/assets/3422a9e7-8961-4e94-aac6-57634cd22a95" />
 
-The query below is used to identify customer_unique_id and the number of orders ordered as qtd_ids. 
+The following query is used to identify customer_unique_id and the number of orders ordered as qtd_ids. 
 
 ```sql
 SELECT
@@ -84,9 +122,11 @@ Output (data sample):
 ** The results confirm that some customers have multiple customer_id values, meaning they placed more than one order. This validates that customer_unique_id must be used for accurate customer-level analysis, while customer_id should only be used to join orders.**
 
 ---
-4. **Data Cleaning / Preparation**
+4. **Data Cleaning and Preparation**
 
-The data cleaning process has been divided into two phases. Phase 0 (Audiotion) is divided into smaller sessions ranging from Phase 0 to Phase 0.3, and Phase 1 (Cleaning) goes from Phase 1 to Phase 1.4.
+Cleaning is divided into two phases. **Phase 0** audits the data before any changes are made. **Phase 1** applies the actual fixes. A final re-audit in Phase 0.3 confirms the cleaning worked as intended.
+
+---
 
 - Phase 0 — Master audit — document every number before touching anything
 - Phase 0.1 — Referential integrity checks — find all orphan rows
