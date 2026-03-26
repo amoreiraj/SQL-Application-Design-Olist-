@@ -25,7 +25,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 - [Dataset](#dataset)
 - [The Data Analysis Process](#the-data-analysis-process)
   - [1. Business Understanding](#1-business-understanding)
-  - [2. Data Collection](#2-data-collection)
+  - [2. Data Gathering](#2-data-gathering)
   - [3. Data Exploration — EDA](#3-data-exploration--eda)
   - [4. Data Cleaning and Preparation](#4-data-cleaning-and-preparation)
     - [Phase 0 — Master Audit](#phase-0--master-audit)
@@ -93,7 +93,7 @@ The dataset contains 9 CSV files representing a normalised e-commerce schema. Ea
 
 ---
 
-### 2. Data Collection
+### 2. Data Gathering
 
 The dataset was downloaded from Kaggle and imported into MySQL Workbench as 9 separate tables. No transformations were applied at import, the goal was to preserve the raw data exactly as provided before beginning any cleaning or analysis.
 
