@@ -18,7 +18,7 @@ The goal was to move beyond writing isolated queries and learn to think like a d
 </p>
 
 ---
-
+ 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
