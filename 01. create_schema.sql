@@ -1,1 +1,1 @@
-
+CREATE DATABASE brazilian_ecommerce_olist;
